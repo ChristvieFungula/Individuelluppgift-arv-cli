@@ -1,0 +1,4 @@
+[wokwi]
+version=1
+firmware = "build/Individuelluppgift-arv-cli.ino.hex"
+elf = "build/Individuelluppgift-arv-cli.ino.elf"
