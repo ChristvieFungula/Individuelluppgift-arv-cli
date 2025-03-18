@@ -8,7 +8,9 @@
 #define GREEN_BTN 7
 #define BLUE_BTN 6
 
-
+unsigned long previousMillis = 0;
+const unsigned long interval = 2000;
+bool ledState = LOW;
 
 void setup() {
     pinMode(RED_LED, OUTPUT);
@@ -23,21 +25,13 @@ void setup() {
 }
 
 void loop() {
-    if(digitalRead(RED_BTN) == LOW){
-        digitalWrite(RED_LED, HIGH);
-    } else {
-        digitalWrite(RED_LED, LOW);
-    }
+    unsigned long currentMillis = millis();
 
-    if(digitalRead(GREEN_BTN) == LOW){
-        digitalWrite(GREEN_LED, HIGH);
-    } else {
-        digitalWrite(GREEN_LED, LOW);
+    if(currentMillis - previousMillis >= interval){
+        previousMillis = currentMillis;
+        ledState = !ledState;
+        digitalWrite(RED_LED, ledState);
+        digitalWrite(GREEN_LED, ledState);
+        digitalWrite(BLUE_LED, ledState);
     }
-
-    if(digitalRead(BLUE_BTN) == LOW){
-        digitalWrite(BLUE_LED, HIGH);
-    } else {
-        digitalWrite(BLUE_LED, LOW);
     }
-}
