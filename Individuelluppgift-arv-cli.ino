@@ -39,7 +39,13 @@ bool disableRedBlink = false;
 bool disableGreenBlink = false;
 bool disableBlueBlink = false;
 
+bool disableRedButton = false;
+bool disableGreenButton = false;
+bool disableBlueButton = false;
+bool disablePotentiometer = false;
+
 void setup() {
+
     pinMode(RED_LED, OUTPUT);
     pinMode(GREEN_LED, OUTPUT);
     pinMode(BLUE_LED, OUTPUT);
@@ -52,36 +58,36 @@ void setup() {
     pinMode(GREEN_BTN, INPUT_PULLUP);
     pinMode(BLUE_BTN, INPUT_PULLUP);
 
-    
     digitalWrite(RED_LED, redLedState);
     digitalWrite(GREEN_LED, greenLedState);
     digitalWrite(BLUE_LED, blueLedState);
+    Serial.begin(9600);
 }
 
 void loop() {
-    Serial.begin(9600);
+    handleSerialCommands();
     unsigned long currentMillis = millis();
 
     if (currentMillis - previousMillis >= interval) {
         previousMillis = currentMillis;
 
-        if (!disableRedBlink) {
+        if (!disableRedBlink && !disableRedButton) {
             redLedState = !redLedState;
             digitalWrite(RED_LED, redLedState);
         }
 
-        if (!disableGreenBlink) {
+        if (!disableGreenBlink && !disableGreenButton) {
             greenLedState = !greenLedState;
             digitalWrite(GREEN_LED, greenLedState);
         }
 
-        if (!disableBlueBlink) {
+        if (!disableBlueBlink && !disableBlueButton) {
             blueLedState = !blueLedState;
             digitalWrite(BLUE_LED, blueLedState);
         }
     }
 
-    if(!disableBlueBlink){
+    if(!disableBlueBlink && !disablePotentiometer){
         setBrightness(POT_PIN, BLUE_LED);
     }
 
@@ -122,4 +128,17 @@ void setBrightness(int potPin, int ledPin){
     int potValue = analogRead(potPin);
     int brightness = map(potValue, 0, 1023, 0, 255);
     analogWrite(ledPin, brightness);
+}
+
+void handleSerialCommands(){
+    if(Serial.available() > 0){
+        String command = Serial.readStringUntil('\n');
+        command.trim();
+
+    if(command.startsWith("disable button")){
+       int button = command.substring(15).toInt();
+       if(button == 1) disableRedButton = true;
+       Serial.println("Command executed: " + command);    
+        }
+    }
 }
