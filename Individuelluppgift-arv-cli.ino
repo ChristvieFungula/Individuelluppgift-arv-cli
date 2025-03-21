@@ -179,21 +179,25 @@ void handleSerialCommands(){
     
     }else if (command.startsWith("LedPower")){
        int power = command.substring(9).toInt();
-       if(power >= 0 && power <=10){
+       if(power >= 0 && power <= 10){
         overrideBlueLed = true;
         overrideBlueLedPower = power;
        }else if(power == -1){
         overrideBlueLed = false;
         overrideBlueLedPower = -1;
        }
-    }
+
+    }else if(command.startsWith("reset")){
+        resetProgram();
+        }
+
        Serial.println("Command executed: " + command);    
         }
     }
 
 void resetProgram() {
     unsigned long currentTime = millis();
-    if (currentTime - lastResetTime > debounceDelay) {
+    if(currentTime - lastResetTime > debounceDelay) {
         lastResetTime = currentTime;
 
         Serial.println("Reset triggered!");
