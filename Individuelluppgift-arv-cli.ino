@@ -44,6 +44,11 @@ bool disableGreenButton = false;
 bool disableBlueButton = false;
 bool disablePotentiometer = false;
 
+bool overrideRedLed = false;
+bool overrideGreenLed = false;
+bool overrideBlueLed = false;
+bool overrideBlueLedPower = -1;
+
 void setup() {
 
     pinMode(RED_LED, OUTPUT);
@@ -71,22 +76,22 @@ void loop() {
     if (currentMillis - previousMillis >= interval) {
         previousMillis = currentMillis;
 
-        if (!disableRedBlink && !disableRedButton) {
+        if (!disableRedBlink && !disableRedButton && !overrideRedLed) {
             redLedState = !redLedState;
             digitalWrite(RED_LED, redLedState);
         }
 
-        if (!disableGreenBlink && !disableGreenButton) {
+        if (!disableGreenBlink && !disableGreenButton && !overrideGreenLed) {
             greenLedState = !greenLedState;
             digitalWrite(GREEN_LED, greenLedState);
         }
 
-        if (!disableBlueBlink && !disableBlueButton) {
+        if (!disableBlueBlink && !disableBlueButton && overrideBlueLed) {
             blueLedState = !blueLedState;
             digitalWrite(BLUE_LED, blueLedState);
         }
     }
-
+    
     if(!disableBlueBlink && !disablePotentiometer){
         setBrightness(POT_PIN, BLUE_LED);
     }
@@ -132,13 +137,38 @@ void setBrightness(int potPin, int ledPin){
 
 void handleSerialCommands(){
     if(Serial.available() > 0){
-        String command = Serial.readStringUntil('\n');
-        command.trim();
+      String command = Serial.readStringUntil('\n');
+      command.trim();
 
     if(command.startsWith("disable button")){
        int button = command.substring(15).toInt();
        if(button == 1) disableRedButton = true;
+       if(button == 2) disableGreenButton = true;
+       if(button == 3) disableBlueButton = true;
+
+    } else if(command.startsWith("enable button")){
+       int button = command.substring(14).toInt();
+       if(button == 1) disableRedButton = false;
+       if(button == 2) disableGreenButton = false;
+       if(button == 3) disableBlueButton = false;
+
+    } else if(command == "disable pot"){
+        disablePotentiometer = true;
+    } else if(command == "enable pot"){
+        disablePotentiometer = false;
+
+    }else if(command.startsWith("LedOff")){
+       int led = command.substring(7).toInt();
+       if(led == 1) overrideRedLed = true;
+       if(led == 2) overrideGreenLed = true;
+    }else if(command.startsWith("LedOn")){
+       int led = command.substring(6).toInt();
+       if(led == 1) overrideRedLed = false;
+       if(led == 2) overrideGreenLed = false;
+    }
+
+
+       
        Serial.println("Command executed: " + command);    
         }
     }
-}
