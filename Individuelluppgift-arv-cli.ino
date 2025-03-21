@@ -81,20 +81,9 @@ void loop() {
     if (currentMillis - previousMillis >= interval) {
         previousMillis = currentMillis;
 
-        if (!disableRedBlink && !disableRedButton && !overrideRedLed) {
-            redLedState = !redLedState;
-            digitalWrite(RED_LED, redLedState);
-        }
-
-        if (!disableGreenBlink && !disableGreenButton && !overrideGreenLed) {
-            greenLedState = !greenLedState;
-            digitalWrite(GREEN_LED, greenLedState);
-        }
-
-        if (!disableBlueBlink && !disableBlueButton && !overrideBlueLed) {
-            blueLedState = !blueLedState;
-            digitalWrite(BLUE_LED, blueLedState);
-        }
+        updateLedState(disableRedBlink, disableRedButton, overrideRedLed, redLedState, RED_LED);
+        updateLedState(disableGreenBlink, disableGreenButton, overrideGreenLed, greenLedState, GREEN_LED);
+        updateLedState(disableBlueBlink, disableBlueButton, overrideBlueLed, blueLedState, BLUE_LED);
     }
     if (overrideBlueLed){
         if(overrideBlueLedPower >= 0){
@@ -114,6 +103,13 @@ void loop() {
     handleButton(RED_BTN, lastStateRedBtn, lastDebounceTimeRed, disableRedBlink, redLedState, RED_LED);
     handleButton(GREEN_BTN, lastStateGreenBtn, lastDebounceTimeGreen, disableGreenBlink, greenLedState, GREEN_LED);
     handleButton(BLUE_BTN, lastStateBlueBtn, lastDebounceTimeBlue, disableBlueBlink, blueLedState, BLUE_LED);
+}
+
+void updateLedState(bool &disableBlink, bool &disableButton, bool &overrideLed, bool &ledState, int ledPin){
+    if(!disableBlink && !disableButton && !overrideLed){
+        ledState = !ledState;
+        digitalWrite(ledPin, ledState);
+    }
 }
 
 void handleButton(int btnPin, int &lastStateBtn, unsigned long &lastDebounceTime, bool &disableBlink, bool &ledState, int ledPin) {
