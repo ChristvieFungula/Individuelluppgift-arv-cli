@@ -11,6 +11,7 @@ const int BLUE_RGB = 9;
 #define RED_BTN 8
 #define GREEN_BTN 7
 #define BLUE_BTN 6
+#define RESET_BTN 2
 
 #define POT_PIN A0
 #define POT_RED A2
@@ -30,6 +31,7 @@ const int debounceDelay = 50;
 unsigned long lastDebounceTimeRed = 0;
 unsigned long lastDebounceTimeGreen = 0;
 unsigned long lastDebounceTimeBlue = 0;
+volatile unsigned long lastResetTime = 0;
 
 int lastStateRedBtn = HIGH;
 int lastStateGreenBtn = HIGH;
@@ -62,6 +64,9 @@ void setup() {
     pinMode(RED_BTN, INPUT_PULLUP);
     pinMode(GREEN_BTN, INPUT_PULLUP);
     pinMode(BLUE_BTN, INPUT_PULLUP);
+
+    pinMode(RESET_BTN, INPUT_PULLUP);
+    attachInterrupt(digitalPinToInterrupt(RESET_BTN), resetProgram, FALLING);
 
     digitalWrite(RED_LED, redLedState);
     digitalWrite(GREEN_LED, greenLedState);
@@ -185,3 +190,35 @@ void handleSerialCommands(){
        Serial.println("Command executed: " + command);    
         }
     }
+
+void resetProgram() {
+    unsigned long currentTime = millis();
+    if (currentTime - lastResetTime > debounceDelay) {
+        lastResetTime = currentTime;
+
+        Serial.println("Reset triggered!");
+
+        redLedState = LOW;
+        greenLedState = LOW;
+        blueLedState = LOW;
+
+        disableRedBlink = false;
+        disableGreenBlink = false;
+        disableBlueBlink = false;
+
+        disableRedButton = false;
+        disableGreenButton = false;
+        disableBlueButton = false;
+
+        disablePotentiometer = false;
+
+        overrideRedLed = false;
+        overrideGreenLed = false;
+        overrideBlueLed = false;
+        overrideBlueLedPower = -1;
+
+        digitalWrite(RED_LED, redLedState);
+        digitalWrite(GREEN_LED, greenLedState);
+        digitalWrite(BLUE_LED, blueLedState);
+    }
+}
