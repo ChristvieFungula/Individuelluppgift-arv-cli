@@ -91,7 +91,7 @@ void loop() {
             digitalWrite(BLUE_LED, blueLedState);
         }
     }
-    
+
     if(!disableBlueBlink && !disablePotentiometer){
         setBrightness(POT_PIN, BLUE_LED);
     }
@@ -145,7 +145,6 @@ void handleSerialCommands(){
        if(button == 1) disableRedButton = true;
        if(button == 2) disableGreenButton = true;
        if(button == 3) disableBlueButton = true;
-
     } else if(command.startsWith("enable button")){
        int button = command.substring(14).toInt();
        if(button == 1) disableRedButton = false;
@@ -161,14 +160,13 @@ void handleSerialCommands(){
        int led = command.substring(7).toInt();
        if(led == 1) overrideRedLed = true;
        if(led == 2) overrideGreenLed = true;
+       if(led == 3) overrideBlueLed = true;
     }else if(command.startsWith("LedOn")){
        int led = command.substring(6).toInt();
        if(led == 1) overrideRedLed = false;
        if(led == 2) overrideGreenLed = false;
+       if(led == 3) overrideBlueLed = false;
     }
-
-
-       
        Serial.println("Command executed: " + command);    
         }
     }
